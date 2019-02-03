@@ -1,6 +1,6 @@
-from TrafficEstimator import TrafficEstimator
+from Speed import Speed
 
-vc = TrafficEstimator("./", "sample.mp4", 60.0, [10,-10],
+vc = Speed("./", "sample.mp4", 60.0, [10,-10],
                       [400, 345, 332], [0.00, 3.66, 7.32], 0.4669, 0.0, 4.27)
 # Find the heat map/heat trace of the video.
 vc.find_trace()
