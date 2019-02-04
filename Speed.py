@@ -22,8 +22,8 @@ class Speed:
         self.dim = [int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
                     int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))] # Size of video frame
         #print self.dim
-        self.duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) # Total number of frames
-        self.fps = fps # Frames per second
+        self.duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) 
+        self.fps = fps 
         self.div = div # Vertical division
         self.im_coor = im_coor # Input image coordinates
         self.re_coor = re_coor # Input physical coordinates
@@ -35,14 +35,13 @@ class Speed:
         else:
             self.beta = self.alpha
             self.length = self.dim[1]
-        self.d = d # Distance from PiCam to outer lane
+        self.d = d # Distance from camera
         self.kernel = np.ones((3,3),np.uint8)
 
-    # Find the trace of passing vehicles. A revised pipeline using
-    # DBSCAN and perhaps some RANSAC-like robust fitting is applied here.
+    
     def find_trace(self):
-        trace = [] # Horizontal heat map
-        elev = [] # Vertical heat map
+        trace = [] 
+        elev = [] 
         cap = cv2.VideoCapture(self.SRC+self.VID)
         max_duration = self.duration
         time = 0
@@ -90,32 +89,32 @@ class Speed:
         CR = ((Ai-Ci)*(Xi-Di))/((Xi-Ci)*(Ai-Di))
         # Back-calculate real world location of the object.
         Xr = (Dr-CR*(Dr-Ar)/(Cr-Ar)*Cr) / (1-CR*(Dr-Ar)/(Cr-Ar))
-        # Calculate horizontal pixel to meter conversion factor.
+        
         factor = 2.0*(self.d+Xr)*np.tan(self.beta)/self.length
         return px_speed*factor*self.fps, self.d+Xr
 
     # Extract dynamics from discovered traces using DBSCAN and convex hull.
     def analyze_trace(self):
         print "Analyzing trace using CONVEX HULL..."
-        # Threshold value to find vehicle traces.
+       
         thresh = 750
         trace = np.load(self.SRC+self.VID.replace(".mp4", "_trace.npy"))
         mask = trace > thresh
-        # Find the horizontal image coordinates of the foreground pixels.
+        
         trace_pixels = np.column_stack(np.where(mask))
         elev = np.load(self.SRC+self.VID.replace(".mp4", "_elev.npy"))
         mask = elev > thresh
-        # Find the vertical image coordinates of the foreground pixels.
+       
         elev_pixels = np.column_stack(np.where(mask))
 
-        # Plot histograms for debugging purpose.
+       
         if False:
             fig = plt.figure()
             ax1 = fig.add_subplot(2,1,1)
-            #ax1.hist(trace.flatten(),bins=50)
+            
             ax1.plot(trace_pixels[:,0], trace_pixels[:,1],'.')
             ax2 = fig.add_subplot(2,1,2)
-            #ax2.hist(elev.flatten(),bins=50)
+            
             ax2.plot(elev_pixels[:,0], elev_pixels[:,1],'.')
             plt.show()
 
